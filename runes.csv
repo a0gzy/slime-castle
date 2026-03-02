@@ -1,0 +1,33 @@
+,Mythic Rune Tracker,,,,,,,%,,,,,,,,,,,,,,,
+,Attack,,TRUE,TRUE,TRUE,TRUE,,100%,,"Your steps to use the table correctly:
+
+1. Make sure to log into your Google account.  
+2. Click on the ""Copy Table"" cell once, then follow the link.  
+3. Confirm copying the table to your Google Drive.  
+4. Use it and enjoy!  
+
+Attention! Do not modify any locked formulas or formats.  
+Doing so may cause the entire table to function incorrectly.
+
+Created: by Kollans. For Slime Castle players.",,,,,,,,,,,,,
+,Attack Speed,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Critical Chance,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Critical Damage,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Critical Resistance,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Hit Rate,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Double Attack Damage,,FALSE,TRUE,FALSE,TRUE,,50%,,,,,,,,,,,,,,,
+,Range Damage,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Multi Attack Chance,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Splash Chance,,TRUE,TRUE,FALSE,TRUE,,75%,,,,,,,,,,,,,,,
+,Splash Damage,,TRUE,TRUE,TRUE,TRUE,,100%,,Copy Table                                                                                                                                                                                                                ,,,,,,,,,,,,,
+,Skill Critical Chance,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Skill Critical Multiplier,,TRUE,TRUE,FALSE,TRUE,,75%,,Дубли,,щит,,,,,,,,,,,осталось рун
+,Health,,TRUE,TRUE,TRUE,TRUE,,100%,,,атк,хитрейт,,кш,у обл,шанс крит навыка,,,,мульти,,шанс по обл,2
+,Regeneration,,TRUE,FALSE,TRUE,TRUE,,75%,,,отражение,,,кш,ш обл,дэдхит,,,,,,,1
+,Dodge Chance,,TRUE,TRUE,TRUE,TRUE,,100%,,,хп,реген,,кш х2,,резист,,спид,,отраж,,скил шк х2,5
+,Damage Return,,TRUE,TRUE,TRUE,TRUE,,100%,,,чёто область,,,мульти,,резист,,резист,,щит,атк,,1
+,Shield HP,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Life Steal,,TRUE,TRUE,TRUE,TRUE,,100%,,,,,,,,,,,,,,,
+,Dead Hit,,TRUE,TRUE,TRUE,FALSE,,75%,,,,,,,,,,,,,,,
+,Grievous Wound,,FALSE,TRUE,TRUE,TRUE,,75%,,,,,,,,,,,,,,,
+,All Runes,,90%,95%,86%,95%,,"91,5%",,,,,,,,,,,,,,,

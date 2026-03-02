@@ -1,347 +1,151 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import styles from './bingo.module.css';
+import Link from 'next/link';
+import { Grid3X3, Beaker, FileText, ArrowRight, Sparkles, Coins } from 'lucide-react';
+import { useLanguage } from '../components/providers/LanguageProvider';
 
-type Board = number[]; // 0 = empty, 1 = occupied
-type CompletedLine = { type: 'row' | 'col' | 'diag1' | 'diag2'; index: number };
+export default function LandingPage() {
+  const { lang } = useLanguage();
 
-const SIZE = 5;
-const MAX_MOVES = 16;
-const TARGET_LINES = 4;
-const SIMULATIONS = 1000; // больше симуляций для точности
-
-// Получить все возможные линии
-const getAllLines = () => {
-  const lines = [];
-  for (let r = 0; r < SIZE; r++) {
-    lines.push({ 
-      type: 'row', 
-      cells: Array.from({ length: SIZE }, (_, c) => r * SIZE + c) 
-    });
-  }
-  for (let c = 0; c < SIZE; c++) {
-    lines.push({ 
-      type: 'col', 
-      cells: Array.from({ length: SIZE }, (_, r) => r * SIZE + c) 
-    });
-  }
-  lines.push({ 
-    type: 'diag1', 
-    cells: Array.from({ length: SIZE }, (_, i) => i * SIZE + i) 
-  });
-  lines.push({ 
-    type: 'diag2', 
-    cells: Array.from({ length: SIZE }, (_, i) => i * SIZE + (SIZE - 1 - i)) 
-  });
-  return lines;
-};
-
-// Проверка: завершает ли ход линию
-const completesLine = (idx: number, b: Board): boolean => {
-  const lines = getAllLines();
-  for (const line of lines) {
-    if (line.cells.includes(idx)) {
-      const filledCount = line.cells.filter(cell => b[cell]).length;
-      if (filledCount === 4) {
-        return true;
-      }
+  const t = {
+    ru: {
+      title: "Ваш идеальный помощник для Slime Castle",
+      subtitle: "Отслеживайте руны, рассчитывайте оптимальные ходы в бинго и изучайте официальные гайды — всё в одном месте.",
+      primaryBtn: "Открыть Бинго",
+      secondaryBtn: "Читать Гайды",
+      trusted: "Используется топовыми игроками и гильдиями",
+      bingoTitle: "Bingo Helper",
+      bingoDesc: "Умный алгоритм и тепловые карты для максимизации закрытых линий бинго.",
+      runesTitle: "Rune Tracker",
+      runesDesc: "Удобный инструмент для поиска лучших комбинаций мифических рун.",
+      monopolyTitle: "Monopoly Tracker",
+      monopolyDesc: "Отслеживание бросков и расчет лучшего маршрута (В разработке).",
+      guideTitle: "Официальные Гайды",
+      guideDesc: "Полные стратегии и советы от комьюнити Slime Castle."
+    },
+    en: {
+      title: "Your ultimate companion for Slime Castle",
+      subtitle: "Track runes, calculate optimal bingo moves, and explore official guides—all in one place.",
+      primaryBtn: "Open Bingo",
+      secondaryBtn: "Read Guides",
+      trusted: "Trusted by top players and guilds",
+      bingoTitle: "Bingo Helper",
+      bingoDesc: "Smart algorithm and heatmaps to maximize your completed bingo lines.",
+      runesTitle: "Rune Tracker",
+      runesDesc: "Convenient tool to find the best mythic rune combinations.",
+      monopolyTitle: "Monopoly Tracker",
+      monopolyDesc: "Roll tracking and best route calculation (Coming soon).",
+      guideTitle: "Official Guides",
+      guideDesc: "Comprehensive strategies and tips from the Slime Castle community."
     }
-  }
-  return false;
-};
-
-// Проверка: создает ли ход почти-линию
-const createsAlmostLine = (idx: number, b: Board): boolean => {
-  const lines = getAllLines();
-  for (const line of lines) {
-    if (line.cells.includes(idx)) {
-      const filledCount = line.cells.filter(cell => b[cell]).length;
-      if (filledCount === 3) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-// Оценка количества занятых клеток в линиях
-const getLineCompletion = (idx: number, b: Board): number => {
-  let score = 0;
-  const lines = getAllLines();
-  
-  for (const line of lines) {
-    if (line.cells.includes(idx)) {
-      const filledCount = line.cells.filter(cell => b[cell]).length;
-      score += filledCount;
-    }
-  }
-  
-  return score;
-};
-
-// Симуляция случайного завершения игры
-const simulateGame = (b: Board, movesLeft: number): number => {
-  const newBoard = [...b];
-  const empty = newBoard.map((_, i) => i).filter(i => !newBoard[i]);
-  const toFill = Math.min(movesLeft, empty.length);
-  
-  // Заполняем случайно оставшиеся клетки
-  for (let i = 0; i < toFill; i++) {
-    const idx = empty[Math.floor(Math.random() * empty.length)];
-    newBoard[idx] = 1;
-    empty.splice(empty.indexOf(idx), 1);
-  }
-  
-  // Считаем линии
-  const lines = getAllLines().filter(line => 
-    line.cells.every(cell => newBoard[cell])
-  );
-  return lines.length;
-};
-
-// Оценка клетки (динамическая)
-const evaluateCell = (idx: number, b: Board, movesLeft: number): number => {
-  if (b[idx]) return -Infinity;
-  
-  // 1. АБСОЛЮТНЫЙ ПРИОРИТЕТ: завершение линии
-  if (completesLine(idx, b)) {
-    return 10000;
-  }
-  
-  // 2. Высокий приоритет: создание почти-линии
-  if (createsAlmostLine(idx, b)) {
-    return 5000;
-  }
-  
-  // 3. Динамическая оценка текущего состояния
-  let score = 0;
-  
-  // 3.1. Количество занятых клеток в линиях
-  const lineCompletion = getLineCompletion(idx, b);
-  score += lineCompletion * 100;
-  
-  // 3.2. Количество линий, в которых участвует клетка
-  const linesCount = getAllLines().filter(line => line.cells.includes(idx)).length;
-  score += linesCount * 50;
-  
-  // 3.3. Адаптивный бонус для ключевых конфигураций
-  const diag1 = [0, 6, 12, 18, 24]; // 1,7,13,19,25
-  const diag2 = [4, 8, 12, 16, 20]; // 5,9,13,17,21
-  
-  // Если диагональ 1 частично заполнена → бонус
-  const diag1Filled = diag1.filter(cell => b[cell]).length;
-  if (diag1.includes(idx) && diag1Filled > 1) {
-    score += diag1Filled * 300;
-  }
-  
-  // Если диагональ 2 частично заполнена → бонус
-  const diag2Filled = diag2.filter(cell => b[cell]).length;
-  if (diag2.includes(idx) && diag2Filled > 1) {
-    score += diag2Filled * 300;
-  }
-  
-  // 4. MCTS-симуляции (если нет срочных ходов)
-  if (score < 1000) {
-    let successCount = 0;
-    const testBoard = [...b];
-    testBoard[idx] = 1;
-    
-    for (let i = 0; i < SIMULATIONS; i++) {
-      const linesCount = simulateGame(testBoard, movesLeft - 1);
-      if (linesCount >= TARGET_LINES) successCount++;
-    }
-    
-    score += successCount;
-  }
-  
-  return score;
-};
-
-export default function BingoHelper() {
-  const [board, setBoard] = useState<Board>(Array(25).fill(0));
-  const [completedLines, setCompletedLines] = useState<CompletedLine[]>([]);
-  const [hint, setHint] = useState<string>('');
-  const [bestMove, setBestMove] = useState<number | null>(null);
-  const [moveHistory, setMoveHistory] = useState<number[]>([]);
-  const [phase, setPhase] = useState<'yours' | 'random'>('yours');
-
-  // Получить завершённые линии
-  const getLines = (b: Board): CompletedLine[] => {
-    const lines: CompletedLine[] = [];
-    for (let r = 0; r < SIZE; r++) {
-      if (b.slice(r * SIZE, r * SIZE + SIZE).every(x => x)) {
-        lines.push({ type: 'row', index: r });
-      }
-    }
-    for (let c = 0; c < SIZE; c++) {
-      if (Array.from({ length: SIZE }, (_, r) => b[r * SIZE + c]).every(x => x)) {
-        lines.push({ type: 'col', index: c });
-      }
-    }
-    if (Array.from({ length: SIZE }, (_, i) => b[i * SIZE + i]).every(x => x)) {
-      lines.push({ type: 'diag1', index: -1 });
-    }
-    if (Array.from({ length: SIZE }, (_, i) => b[i * SIZE + (SIZE - 1 - i)]).every(x => x)) {
-      lines.push({ type: 'diag2', index: -1 });
-    }
-    return lines;
-  };
-
-  const getLineIndices = (line: CompletedLine): number[] => {
-    if (line.type === 'row') {
-      return Array.from({ length: SIZE }, (_, c) => line.index * SIZE + c);
-    }
-    if (line.type === 'col') {
-      return Array.from({ length: SIZE }, (_, r) => r * SIZE + line.index);
-    }
-    if (line.type === 'diag1') {
-      return Array.from({ length: SIZE }, (_, i) => i * SIZE + i);
-    }
-    if (line.type === 'diag2') {
-      return Array.from({ length: SIZE }, (_, i) => i * SIZE + (SIZE - 1 - i));
-    }
-    return [];
-  };
-
-  const completedIndices = completedLines.flatMap(getLineIndices);
-
-  const calculateHint = (b: Board) => {
-    const empty = b.map((_, i) => i).filter(i => !b[i]);
-    if (empty.length === 0) {
-      setBestMove(null);
-      setHint('Все клетки заняты.');
-      return;
-    }
-
-    const movesLeft = MAX_MOVES - moveHistory.length;
-    
-    // 1. Ищем клетки, завершающие линии
-    const completingMoves = empty.filter(idx => completesLine(idx, b));
-    if (completingMoves.length > 0) {
-      setBestMove(completingMoves[0]);
-      const cellNumber = completingMoves[0] + 1;
-      setHint(`🔥 Завершите линию! ${cellNumber}`);
-      return;
-    }
-    
-    // 2. Ищем клетки, создающие почти-линии
-    const almostMoves = empty.filter(idx => createsAlmostLine(idx, b));
-    if (almostMoves.length > 0) {
-      const best = almostMoves[0];
-      setBestMove(best);
-      const cellNumber = best + 1;
-      setHint(`⚠️ Создайте почти-линию: ${cellNumber}`);
-      return;
-    }
-    
-    // 3. Оценка всех свободных клеток
-    const scores = empty.map(idx => ({
-      idx,
-      score: evaluateCell(idx, b, movesLeft)
-    }));
-
-    const best = scores.reduce((a, b) => a.score > b.score ? a : b);
-    setBestMove(best.idx);
-    const cellNumber = best.idx + 1;
-    setHint(`🎯 Оптимальный ход: ${cellNumber}`);
-  };
-
-  const handleClick = (idx: number) => {
-    if (board[idx] || moveHistory.length >= MAX_MOVES) return;
-
-    const newBoard = [...board];
-    newBoard[idx] = 1;
-    const newHistory = [...moveHistory, idx];
-    const newPhase = phase === 'yours' ? 'random' : 'yours';
-
-    setBoard(newBoard);
-    setMoveHistory(newHistory);
-    setPhase(newPhase);
-
-    const lines = getLines(newBoard);
-    setCompletedLines(lines);
-
-    if (newPhase === 'random') {
-      setBestMove(null);
-      setHint('🔢 Отметьте выпавшее число');
-    } else {
-      calculateHint(newBoard);
-    }
-
-    if (newHistory.length === MAX_MOVES) {
-      const linesCount = lines.length;
-      setHint(`🎉 Готово! Линий: ${linesCount}/${TARGET_LINES}`);
-      setBestMove(null);
-      setTimeout(reset, 2000);
-    }
-  };
-
-  const undo = () => {
-    if (moveHistory.length === 0) return;
-    const newHistory = moveHistory.slice(0, -1);
-    const newBoard = Array(25).fill(0);
-    newHistory.forEach(i => newBoard[i] = 1);
-    const newPhase = newHistory.length % 2 === 0 ? 'yours' : 'random';
-
-    setBoard(newBoard);
-    setMoveHistory(newHistory);
-    setPhase(newPhase);
-
-    const lines = getLines(newBoard);
-    setCompletedLines(lines);
-
-    if (newPhase === 'yours') {
-      calculateHint(newBoard);
-    } else {
-      setBestMove(null);
-      setHint('🔢 Отметьте выпавшее число');
-    }
-  };
-
-  const reset = () => {
-    setBoard(Array(25).fill(0));
-    setMoveHistory([]);
-    setPhase('yours');
-    setCompletedLines([]);
-    calculateHint(Array(25).fill(0));
-  };
-
-  useEffect(() => {
-    reset();
-  }, []);
+  }[lang];
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>🎯 Бинго — Slime Castle (26% - на 4 линии)</h1>
-      
-      <div className={styles.info}>
-        <p><strong>Ходы:</strong> {moveHistory.length} / {MAX_MOVES}</p>
-        <p><strong>Линии:</strong> {completedLines.length} / {TARGET_LINES}</p>
-        <div className={styles.hint}>{hint}</div>
+    <div className="flex-1 flex flex-col items-center pt-20 pb-16 px-6 bg-zinc-950">
+      {/* Hero Section */}
+      <div className="max-w-4xl w-full flex flex-col items-center text-center space-y-8 mt-8">
+
+        {/* Big Heading */}
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
+          {t.title.split('Slime Castle')[0]}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+            Slime Castle
+          </span>
+          {t.title.split('Slime Castle')[1]}
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed">
+          {t.subtitle}
+        </p>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+          <Link
+            href="/bingo"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-200 transition-colors"
+          >
+            {t.primaryBtn}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/guide"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-zinc-900 text-white font-semibold rounded-lg hover:bg-zinc-800 border border-zinc-800 transition-colors"
+          >
+            {t.secondaryBtn}
+          </Link>
+        </div>
       </div>
 
-      <div className={styles.grid}>
-        {board.map((val, idx) => {
-          const inLine = completedIndices.includes(idx);
-          const isBest = phase === 'yours' && bestMove === idx;
-          return (
-            <div
-              key={idx}
-              className={`${styles.cell} ${
-                val ? inLine ? styles.lineCell : styles.occupiedCell : ''
-              } ${isBest ? styles.bestMove : ''}`}
-              onClick={() => handleClick(idx)}
-            >
-              {val ? '✓' : idx + 1}
-            </div>
-          );
-        })}
+      {/* Social Proof Placeholder */}
+      <div className="mt-24 mb-12 w-full overflow-hidden opacity-60">
+        <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-10 text-center">
+          {t.trusted}
+        </p>
+
+        <div className="relative flex overflow-x-hidden">
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 py-4">
+            <span className="text-zinc-600 font-bold text-2xl">TRS</span>
+            <span className="text-zinc-600 font-bold text-2xl">SCA ZOO</span>
+            <span className="text-zinc-600 font-bold text-2xl">WTF</span>
+            <span className="text-zinc-600 font-bold text-2xl">RoKings</span>
+            <span className="text-zinc-600 font-bold text-2xl">Rimuru City</span>
+            <span className="text-zinc-600 font-bold text-2xl">MrPug</span>
+            {/* Duplicate for seamless scroll */}
+            <span className="text-zinc-600 font-bold text-2xl">TRS</span>
+            <span className="text-zinc-600 font-bold text-2xl">SCA ZOO</span>
+            <span className="text-zinc-600 font-bold text-2xl">WTF</span>
+            <span className="text-zinc-600 font-bold text-2xl">RoKings</span>
+            <span className="text-zinc-600 font-bold text-2xl">Rimuru City</span>
+            <span className="text-zinc-600 font-bold text-2xl">MrPug</span>
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
-        <button onClick={undo} className={styles.undoBtn}>↩️ Отменить</button>
-        <button onClick={reset} className={styles.resetBtn}>🔄 Сброс</button>
+      {/* Features Grid */}
+      <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+
+        <Link href="/bingo" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-blue-500/50">
+          <div className="h-12 w-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <Grid3X3 className="h-6 w-6" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-3">{t.bingoTitle}</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            {t.bingoDesc}
+          </p>
+        </Link>
+
+        <Link href="/runes" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-emerald-500/50">
+          <div className="h-12 w-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <Beaker className="h-6 w-6" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-3">{t.runesTitle}</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            {t.runesDesc}
+          </p>
+        </Link>
+
+        <div className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl opacity-75 cursor-not-allowed relative overflow-hidden">
+          <div className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-300 px-2 py-1 rounded">Soon</div>
+          <div className="h-12 w-12 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-xl flex items-center justify-center mb-6 transition-transform">
+            <Coins className="h-6 w-6" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-3">{t.monopolyTitle}</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            {t.monopolyDesc}
+          </p>
+        </div>
+
+        <Link href="/guide" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-purple-500/50">
+          <div className="h-12 w-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <FileText className="h-6 w-6" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-3">{t.guideTitle}</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            {t.guideDesc}
+          </p>
+        </Link>
+
       </div>
     </div>
   );
