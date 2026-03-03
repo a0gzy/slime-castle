@@ -236,9 +236,9 @@ export default function RunesPage() {
 
                     {/* DUPLICATES BLOCK */}
                     <div className="flex flex-col bg-[#0c0c0e] border border-zinc-900 border-opacity-50 rounded-2xl p-7 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500/20 to-transparent" />
+                        <div className="absolute top-0 left-0 w-1 h-full bg-linear-to-b from-emerald-500/20 to-transparent" />
                         <div className="text-zinc-500 font-bold mb-6 uppercase text-xs tracking-[0.2em] flex items-center gap-3">
-                            <span className="w-8 h-[1px] bg-zinc-800" />
+                            <span className="w-8 h-px bg-zinc-800" />
                             {t('runesPage.duplicates')}
                         </div>
 

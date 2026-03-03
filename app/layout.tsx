@@ -16,8 +16,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Slime Castle Bingo",
-  description: "Slime Castle Bingo helper",
+  title: "Slime Castle Helper | Bingo, Runes & Monopoly Tracker",
+  description: "Your ultimate companion for Slime Castle. Track mythic runes, calculate optimal bingo moves, and manage monopoly events. / Помощник для Slime Castle: трекер рун, расчет бинго и прогресс монополии.",
+  keywords: [
+    "Slime Castle", "Bingo Helper", "Rune Tracker", "Monopoly Event", "Slime Castle Wiki", "Slime Castle Site", "Slime Castle Gifts",
+    "Бинго Слайм Кастл", "Трекер рун", "Монополия гайд", "Слайм Кастл Сайт", "Слайм Кастл Гифты",],
+  authors: [{ name: "a0g" }],
+  openGraph: {
+    title: "Slime Castle Helper",
+    description: "Track runes, calculate bingo moves, and manage events. / Трекер рун, расчет бинго и управление ивентами.",
+    url: "https://slime-castle.helper",
+    siteName: "Slime Castle Hub",
+    images: [
+      {
+        url: "/icons/icon.webp",
+        width: 512,
+        height: 512,
+      },
+    ],
+    locale: "ru_RU",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Slime Castle Helper",
+    description: "Your ultimate companion for Slime Castle - track runes, events, and bingo.",
+    images: ["/icons/icon.webp"],
+  },
+  icons: {
+    icon: "/icons/icon.ico",
+    shortcut: "/icons/icon.ico",
+    apple: "/icons/icon.webp",
+  }
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Home, Grid3X3, Beaker, FileText, UserCircle, LogOut, Coins, Menu, X } from 'lucide-react';
+import { Grid3X3, Beaker, FileText, UserCircle, LogOut, Coins, Menu, X } from 'lucide-react';
 import { useLanguage } from './providers/LanguageProvider';
 import { useAuth } from './providers/AuthProvider';
 
@@ -26,7 +26,7 @@ export function Navbar() {
 
                         <div className="flex items-center gap-4 md:gap-8">
                             <Link href="/" className="flex items-center gap-2 transition-colors hover:text-zinc-300">
-                                <Home className="h-5 w-5" />
+                                <img src="/icons/icon.webp" alt="Logo" className="w-6 h-6 object-contain rounded-lg" />
                                 <span className="font-bold shrink-0">Slime Castle <span className="hidden sm:inline">Hub</span></span>
                             </Link>
 
@@ -93,13 +93,13 @@ export function Navbar() {
 
             {/* Mobile Sidebar Overlay */}
             <div
-                className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 z-60 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsMenuOpen(false)}
             />
 
             {/* Mobile Sidebar Content */}
             <div
-                className={`fixed top-0 right-0 z-[70] h-full w-64 bg-zinc-950 border-l border-zinc-800 p-6 shadow-2xl transition-transform duration-300 ease-out md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`fixed top-0 right-0 z-70 h-full w-64 bg-zinc-950 border-l border-zinc-800 p-6 shadow-2xl transition-transform duration-300 ease-out md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 <div className="flex flex-col h-full">
                     <div className="flex justify-between items-center mb-10">
