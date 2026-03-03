@@ -5,40 +5,7 @@ import { Grid3X3, Beaker, FileText, ArrowRight, Sparkles, Coins } from 'lucide-r
 import { useLanguage } from '../components/providers/LanguageProvider';
 
 export default function LandingPage() {
-  const { lang } = useLanguage();
-
-  const t = {
-    ru: {
-      title: "Ваш идеальный помощник для Slime Castle",
-      subtitle: "Отслеживайте руны, рассчитывайте оптимальные ходы в бинго и изучайте официальные гайды — всё в одном месте.",
-      primaryBtn: "Открыть Бинго",
-      secondaryBtn: "Читать Гайды",
-      trusted: "Используется топовыми игроками и гильдиями",
-      bingoTitle: "Bingo Helper",
-      bingoDesc: "Умный алгоритм и тепловые карты для максимизации закрытых линий бинго.",
-      runesTitle: "Rune Tracker",
-      runesDesc: "Удобный инструмент для поиска лучших комбинаций мифических рун.",
-      monopolyTitle: "Monopoly Tracker",
-      monopolyDesc: "Отслеживание бросков и расчет лучшего маршрута (В разработке).",
-      guideTitle: "Официальные Гайды",
-      guideDesc: "Полные стратегии и советы от комьюнити Slime Castle."
-    },
-    en: {
-      title: "Your ultimate companion for Slime Castle",
-      subtitle: "Track runes, calculate optimal bingo moves, and explore official guides—all in one place.",
-      primaryBtn: "Open Bingo",
-      secondaryBtn: "Read Guides",
-      trusted: "Trusted by top players and guilds",
-      bingoTitle: "Bingo Helper",
-      bingoDesc: "Smart algorithm and heatmaps to maximize your completed bingo lines.",
-      runesTitle: "Rune Tracker",
-      runesDesc: "Convenient tool to find the best mythic rune combinations.",
-      monopolyTitle: "Monopoly Tracker",
-      monopolyDesc: "Roll tracking and best route calculation (Coming soon).",
-      guideTitle: "Official Guides",
-      guideDesc: "Comprehensive strategies and tips from the Slime Castle community."
-    }
-  }[lang];
+  const { t } = useLanguage();
 
   return (
     <div className="flex-1 flex flex-col items-center pt-20 pb-16 px-6 bg-zinc-950">
@@ -47,16 +14,16 @@ export default function LandingPage() {
 
         {/* Big Heading */}
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
-          {t.title.split('Slime Castle')[0]}
+          {t('landing.title1')}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
             Slime Castle
           </span>
-          {t.title.split('Slime Castle')[1]}
+          {t('landing.title2')}
         </h1>
 
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed">
-          {t.subtitle}
+          {t('landing.subtitle')}
         </p>
 
         {/* CTA Buttons */}
@@ -65,14 +32,14 @@ export default function LandingPage() {
             href="/bingo"
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-200 transition-colors"
           >
-            {t.primaryBtn}
+            {t('landing.primaryBtn')}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
-            href="/guide"
+            href="/wiki"
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-zinc-900 text-white font-semibold rounded-lg hover:bg-zinc-800 border border-zinc-800 transition-colors"
           >
-            {t.secondaryBtn}
+            {t('landing.secondaryBtn')}
           </Link>
         </div>
       </div>
@@ -80,24 +47,21 @@ export default function LandingPage() {
       {/* Social Proof Placeholder */}
       <div className="mt-24 mb-12 w-full overflow-hidden opacity-60">
         <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-10 text-center">
-          {t.trusted}
+          {t('landing.trusted')}
         </p>
 
         <div className="relative flex overflow-x-hidden">
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 py-4">
-            <span className="text-zinc-600 font-bold text-2xl">TRS</span>
-            <span className="text-zinc-600 font-bold text-2xl">SCA ZOO</span>
-            <span className="text-zinc-600 font-bold text-2xl">WTF</span>
-            <span className="text-zinc-600 font-bold text-2xl">RoKings</span>
-            <span className="text-zinc-600 font-bold text-2xl">Rimuru City</span>
-            <span className="text-zinc-600 font-bold text-2xl">MrPug</span>
-            {/* Duplicate for seamless scroll */}
-            <span className="text-zinc-600 font-bold text-2xl">TRS</span>
-            <span className="text-zinc-600 font-bold text-2xl">SCA ZOO</span>
-            <span className="text-zinc-600 font-bold text-2xl">WTF</span>
-            <span className="text-zinc-600 font-bold text-2xl">RoKings</span>
-            <span className="text-zinc-600 font-bold text-2xl">Rimuru City</span>
-            <span className="text-zinc-600 font-bold text-2xl">MrPug</span>
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 py-4">
+            {(() => {
+              const names = [
+                "TRS", "SCA", "ZOO", "WTF", "RoKings", "Авангард", "SF", "Rimuru City", " ",
+                "MrPug", "BadWinner", "EnricoN", "ANRISE", "ArchBishop", "Sion", "Swan", "Sugar", "Andrey", "a0g <3", " "
+              ];
+              // Double the array for a perfect 50% loop
+              return [...names, ...names].map((name, i) => (
+                <span key={i} className="text-zinc-600 font-bold text-2xl">{name}</span>
+              ));
+            })()}
           </div>
         </div>
       </div>
@@ -109,9 +73,9 @@ export default function LandingPage() {
           <div className="h-12 w-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <Grid3X3 className="h-6 w-6" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">{t.bingoTitle}</h3>
+          <h3 className="text-xl font-bold text-white mb-3">{t('landing.bingoTitle')}</h3>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            {t.bingoDesc}
+            {t('landing.bingoDesc')}
           </p>
         </Link>
 
@@ -119,30 +83,29 @@ export default function LandingPage() {
           <div className="h-12 w-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <Beaker className="h-6 w-6" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">{t.runesTitle}</h3>
+          <h3 className="text-xl font-bold text-white mb-3">{t('landing.runesTitle')}</h3>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            {t.runesDesc}
+            {t('landing.runesDesc')}
           </p>
         </Link>
 
-        <div className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl opacity-75 cursor-not-allowed relative overflow-hidden">
-          <div className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-300 px-2 py-1 rounded">Soon</div>
-          <div className="h-12 w-12 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-xl flex items-center justify-center mb-6 transition-transform">
+        <Link href="/monopoly" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-amber-500/50">
+          <div className="h-12 w-12 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <Coins className="h-6 w-6" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">{t.monopolyTitle}</h3>
+          <h3 className="text-xl font-bold text-white mb-3">{t('landing.monopolyTitle')}</h3>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            {t.monopolyDesc}
+            {t('landing.monopolyDesc')}
           </p>
-        </div>
+        </Link>
 
-        <Link href="/guide" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-purple-500/50">
+        <Link href="/wiki" className="group flex flex-col p-8 bg-zinc-900/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/60 transition-all duration-300 hover:border-purple-500/50">
           <div className="h-12 w-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <FileText className="h-6 w-6" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">{t.guideTitle}</h3>
+          <h3 className="text-xl font-bold text-white mb-3">{t('landing.wikiTitle')}</h3>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            {t.guideDesc}
+            {t('landing.wikiDesc')}
           </p>
         </Link>
 

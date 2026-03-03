@@ -5,33 +5,33 @@ import Image from 'next/image';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 
 const RUNES = [
-    { id: 'attack', en: 'Attack', ru: 'Атака' },
-    { id: 'attack_speed', en: 'Attack Speed', ru: 'Скорость атаки' },
-    { id: 'crit_chance', en: 'Critical Chance', ru: 'Шанс крит. удара' },
-    { id: 'crit_damage', en: 'Critical Damage', ru: 'Критический урон' },
-    { id: 'crit_resist', en: 'Critical Resistance', ru: 'Сопр. крит. удару' },
-    { id: 'hit_rate', en: 'Hit Rate', ru: 'Точность' },
-    { id: 'double_attack_damage', en: 'Double Attack Damage', ru: 'Урон двойной атаки' },
-    { id: 'range_damage', en: 'Range Damage', ru: 'Урон дальнего боя' },
-    { id: 'multi_attack', en: 'Multi Attack Chance', ru: 'Шанс мульти-атаки' },
-    { id: 'splash_chance', en: 'Splash Chance', ru: 'Шанс урона по области' },
-    { id: 'splash_damage', en: 'Splash Damage', ru: 'Урон по области' },
-    { id: 'skill_crit_chance', en: 'Skill Critical Chance', ru: 'Крит. шанс навыка' },
-    { id: 'skill_crit_mult', en: 'Skill Critical Multiplier', ru: 'Урон крит. навыка' },
-    { id: 'health', en: 'Health', ru: 'Здоровье' },
-    { id: 'regeneration', en: 'Regeneration', ru: 'Регенерация' },
-    { id: 'dodge_chance', en: 'Dodge Chance', ru: 'Шанс уклонения' },
-    { id: 'damage_return', en: 'Damage Return', ru: 'Отражение урона' },
-    { id: 'shield_hp', en: 'Shield HP', ru: 'Прочность щита' },
-    { id: 'life_steal', en: 'Life Steal', ru: 'Вампиризм' },
-    { id: 'dead_hit', en: 'Dead Hit', ru: 'Смертельный удар' },
-    { id: 'grievous_wound', en: 'Grievous Wound', ru: 'Тяжелая рана' },
+    { id: 'attack' },
+    { id: 'attack_speed' },
+    { id: 'crit_chance' },
+    { id: 'crit_damage' },
+    { id: 'crit_resist' },
+    { id: 'hit_rate' },
+    { id: 'double_attack_damage' },
+    { id: 'range_damage' },
+    { id: 'multi_attack' },
+    { id: 'splash_chance' },
+    { id: 'splash_damage' },
+    { id: 'skill_crit_chance' },
+    { id: 'skill_crit_mult' },
+    { id: 'health' },
+    { id: 'regeneration' },
+    { id: 'dodge_chance' },
+    { id: 'damage_return' },
+    { id: 'shield_hp' },
+    { id: 'life_steal' },
+    { id: 'dead_hit' },
+    { id: 'grievous_wound' },
 ];
 
 type DupeItem = { id: string; checked: boolean };
 
 export default function RunesPage() {
-    const { lang } = useLanguage();
+    const { lang, t } = useLanguage();
     const [grid, setGrid] = useState<Record<string, boolean[]>>({});
     const [dupesList, setDupesList] = useState<Record<number, DupeItem[]>>({});
     const [mounted, setMounted] = useState(false);
@@ -99,7 +99,7 @@ export default function RunesPage() {
     };
 
     const clearAll = () => {
-        if (confirm(lang === 'ru' ? 'Очистить трекер?' : 'Clear tracker?')) {
+        if (confirm(t('common.clear_tracker'))) {
             const initial: Record<string, boolean[]> = {};
             RUNES.forEach(r => initial[r.id] = [false, false, false, false]);
             saveGrid(initial);
@@ -108,19 +108,6 @@ export default function RunesPage() {
     };
 
     if (!mounted) return <div className="min-h-screen bg-[#09090b]" />;
-
-    const t = {
-        ru: {
-            title: "Mythic Rune Tracker",
-            duplicates: "Дубликаты для реролла",
-            allRunes: "All Runes",
-        },
-        en: {
-            title: "Mythic Rune Tracker",
-            duplicates: "Duplicates for reroll",
-            allRunes: "All Runes",
-        }
-    }[lang];
 
     return (
         <div className="flex flex-col p-4 md:p-8 bg-black items-center min-h-[calc(100vh-64px)] text-zinc-300">
@@ -133,7 +120,7 @@ export default function RunesPage() {
                         <div className="min-w-[480px]">
                             <div className="flex items-center mb-6 gap-4 px-2">
                                 <h1 className="text-2xl md:text-3xl font-extrabold text-emerald-600 w-40 md:w-56 text-right tracking-tight leading-tight shrink-0">
-                                    Mythic Rune<br />Tracker
+                                    {t('runesPage.title')}
                                 </h1>
                                 <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
                                     {['sword', 'armor', 'helmet', 'amulet'].map((name, i) => (
@@ -157,7 +144,7 @@ export default function RunesPage() {
                                     return (
                                         <div key={rune.id} className="flex items-center gap-4 hover:bg-zinc-900/40 rounded-lg py-1 px-2 transition-colors">
                                             <div className="w-40 md:w-56 text-right pr-3 text-zinc-400 font-bold text-sm md:text-base shrink-0">
-                                                {lang === 'ru' ? rune.ru : rune.en}
+                                                {t(`runes.${rune.id}`)}
                                             </div>
                                             <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
                                                 {[0, 1, 2, 3].map(colIdx => {
@@ -186,7 +173,7 @@ export default function RunesPage() {
 
                                 <div className="flex items-center gap-4 px-2 py-6 mt-4 border-t border-zinc-800/50">
                                     <div className="w-40 md:w-56 text-right pr-3 text-emerald-600 font-extrabold text-base md:text-lg shrink-0">
-                                        {t.allRunes}
+                                        {t('runesPage.allRunes')}
                                     </div>
                                     <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
                                         {[0, 1, 2, 3].map(colIdx => {
@@ -221,44 +208,28 @@ export default function RunesPage() {
                     <div className="flex flex-col w-full bg-[#18181b] border border-[#27272a] rounded-2xl p-6 shadow-xl">
                         <h3 className="text-xl font-bold text-zinc-100 mb-4 flex items-center gap-2">
                             <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
-                            {lang === 'ru' ? 'Секрет реролла' : 'Reroll Secrets'}
+                            {t('runesPage.reroll_secrets')}
                         </h3>
                         <div className="space-y-4">
                             <div className="px-4 py-3 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg text-blue-100/90 text-[14px] leading-relaxed">
                                 <p className="font-semibold mb-1 text-blue-400 uppercase text-xs tracking-wider">
-                                    {lang === 'ru' ? 'Быстрые действия (Таблица)' : 'Quick Actions (Table)'}
+                                    {t('runesPage.quick_actions')}
                                 </p>
-                                {lang === 'ru' ? (
-                                    <ul className="list-disc pl-4 space-y-1 mb-3">
-                                        <li><strong>ЛКМ</strong> — отметить руну как полученную</li>
-                                        <li><strong>ПКМ</strong> — добавить в список <strong>Дублей</strong></li>
-                                    </ul>
-                                ) : (
-                                    <ul className="list-disc pl-4 space-y-1 mb-3">
-                                        <li><strong>Left Click</strong> — mark as acquired</li>
-                                        <li><strong>Right Click</strong> — add to <strong>Duplicates</strong></li>
-                                    </ul>
-                                )}
+                                <ul className="list-disc pl-4 space-y-1 mb-3">
+                                    <li>{t('runesPage.action_left')}</li>
+                                    <li>{t('runesPage.action_right')}</li>
+                                </ul>
 
                                 <p className="font-semibold mb-1 text-blue-400 uppercase text-xs tracking-wider">
-                                    {lang === 'ru' ? 'Список Дубликатов' : 'Duplicates List'}
+                                    {t('runesPage.dupes_list')}
                                 </p>
-                                {lang === 'ru' ? (
-                                    <ul className="list-disc pl-4 space-y-1">
-                                        <li><strong>ЛКМ</strong> — зачеркнуть (собрано)</li>
-                                        <li><strong>ПКМ</strong> — удалить из списка</li>
-                                    </ul>
-                                ) : (
-                                    <ul className="list-disc pl-4 space-y-1">
-                                        <li><strong>Left Click</strong> — strike-through (collected)</li>
-                                        <li><strong>Right Click</strong> — delete from list</li>
-                                    </ul>
-                                )}
+                                <ul className="list-disc pl-4 space-y-1">
+                                    <li>{t('runesPage.dupes_left')}</li>
+                                    <li>{t('runesPage.dupes_right')}</li>
+                                </ul>
                             </div>
                             <p className="text-zinc-500 text-xs px-1 leading-relaxed italic">
-                                {lang === 'ru'
-                                    ? 'Список дубликатов поможет вам не запутаться, какие именно руны можно безопасно перероллить.'
-                                    : 'The duplicates list below helps you understand which runes can be safely rerolled.'}
+                                {t('runesPage.desc')}
                             </p>
                         </div>
                     </div>
@@ -268,7 +239,7 @@ export default function RunesPage() {
                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500/20 to-transparent" />
                         <div className="text-zinc-500 font-bold mb-6 uppercase text-xs tracking-[0.2em] flex items-center gap-3">
                             <span className="w-8 h-[1px] bg-zinc-800" />
-                            {t.duplicates}
+                            {t('runesPage.duplicates')}
                         </div>
 
                         <div className="flex flex-col gap-5">
@@ -291,7 +262,7 @@ export default function RunesPage() {
                                         <div className="flex-1 flex flex-wrap gap-2.5 items-center">
                                             {list.length === 0 && (
                                                 <span className="text-zinc-700 text-xs italic opacity-80 my-auto py-2">
-                                                    {lang === 'ru' ? 'Нажмите ПКМ по таблице...' : 'Right-click the table...'}
+                                                    {t('runesPage.click_hint')}
                                                 </span>
                                             )}
                                             {list.map((item, itemIdx) => {
@@ -306,7 +277,7 @@ export default function RunesPage() {
                                                             : 'bg-[#1e1e21] text-zinc-300 border-[#2d2d30] shadow-md hover:border-zinc-500 hover:text-white active:scale-95'
                                                             }`}
                                                     >
-                                                        {rune ? (lang === 'ru' ? rune.ru : rune.en) : item.id}
+                                                        {rune ? t(`runes.${rune.id}`) : item.id}
                                                     </button>
                                                 );
                                             })}
@@ -317,12 +288,12 @@ export default function RunesPage() {
                         </div>
 
                         <div className="flex justify-between items-center mt-10">
-                            <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{t.title} v2.5</div>
+                            <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{t('runesPage.title')} v2.5</div>
                             <button
                                 onClick={clearAll}
                                 className="px-5 py-2.5 bg-red-500/5 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider"
                             >
-                                {lang === 'ru' ? 'Сброс' : 'Reset'}
+                                {t('runesPage.reset')}
                             </button>
                         </div>
                     </div>

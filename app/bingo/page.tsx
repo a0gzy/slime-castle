@@ -25,54 +25,7 @@ export default function BingoHelper() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [heatmapData, setHeatmapData] = useState<number[] | null>(null);
-  const { lang } = useLanguage();
-
-  const content = {
-    ru: {
-      moves: "Ходы",
-      lines: "Линии",
-      undo: "Отмена хода",
-      reset: "Новая игра",
-      history: "История игр",
-      emptyHistory: "История пока пуста",
-      clearHistory: "Очистить список",
-      heatmap: "Показать Heatmap (Веса ячеек)",
-      gameOver: "Игра окончена",
-      calculateHint: "Оптимальный ход",
-      waitTurn: "🔢 Отметьте число, которое выпало",
-      gameFinished: "🎉 Завершено! Собрано линий",
-      allMovesDone: "Все возможные ходы завершены",
-      descTitle: "Как это работает?",
-      descText: "Этот инструмент анализирует все возможные комбинации для получения 4 линий и строит тепловую карту (Heatmap). Синим цветом подсвечивается наиболее выгодный ход.",
-      howItWorks: [
-        "Если у нескольких ячеек одинаковый вес, алгоритм выбирает ту, у которой больше активных соседних ячеек на пересекающихся линиях.",
-        "Приоритетное завершение: 4 линии (26% вероятности), если недоступно — 3 или 2 линии.",
-        "Режим Heatmap показывает число оставшихся выигрышных паттернов для каждой ячейки."
-      ]
-    },
-    en: {
-      moves: "Moves",
-      lines: "Lines",
-      undo: "Undo Move",
-      reset: "New Game",
-      history: "Game History",
-      emptyHistory: "History is empty",
-      clearHistory: "Clear List",
-      heatmap: "Show Heatmap (Cell Weights)",
-      gameOver: "Game Over",
-      calculateHint: "Recommended move",
-      waitTurn: "🔢 Mark the number that dropped",
-      gameFinished: "🎉 Finished! Lines collected",
-      allMovesDone: "All possible moves finished",
-      descTitle: "How it works?",
-      descText: "This tool finds finishable 4-line patterns and calculates a heatmap. The blue highlight suggests the best strategic move.",
-      howItWorks: [
-        "If cells have equal weight, it prioritizes those with more active neighbors on crossing lines.",
-        "Targeting: 4 lines (26% chance), falling back to 3 or 2 lines if needed.",
-        "Heatmap mode displays how many winning patterns participate in each cell."
-      ]
-    }
-  };
+  const { lang, t } = useLanguage();
 
   // Load history on mount
   useEffect(() => {
@@ -91,14 +44,14 @@ export default function BingoHelper() {
       return;
     }
     if (moveHistory.length >= MAX_MOVES) {
-      setHint(`${content[lang].gameFinished}: ${completedLines.length}`);
+      setHint(`${t('bingoPage.gameFinished')}: ${completedLines.length}`);
       return;
     }
 
     if (phase === 'yours') {
       calculateHint(board, moveHistory.length);
     } else {
-      setHint(content[lang].waitTurn);
+      setHint(t('bingoPage.waitTurn'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -151,7 +104,7 @@ export default function BingoHelper() {
     if (currentMoves >= MAX_MOVES) {
       setBestMove(null);
       setHeatmapData(null);
-      setHint(content[lang].gameOver);
+      setHint(t('bingoPage.gameOver'));
       return;
     }
 
@@ -161,9 +114,9 @@ export default function BingoHelper() {
     setHeatmapData(heatmap);
 
     if (bestMoveIndex !== null) {
-      setHint(`${content[lang].calculateHint}: №${bestMoveIndex + 1}`);
+      setHint(`${t('bingoPage.calculateHint')}: №${bestMoveIndex + 1}`);
     } else {
-      setHint(content[lang].allMovesDone);
+      setHint(t('bingoPage.allMovesDone'));
     }
   };
 
@@ -184,7 +137,7 @@ export default function BingoHelper() {
 
     if (newHistory.length === MAX_MOVES) {
       const linesCount = lines.length;
-      setHint(`${content[lang].gameFinished}: ${linesCount}`);
+      setHint(`${t('bingoPage.gameFinished')}: ${linesCount}`);
       setBestMove(null);
       setHeatmapData(null);
       saveToHistory(linesCount);
@@ -193,7 +146,7 @@ export default function BingoHelper() {
       if (newPhase === 'random') {
         setBestMove(null);
         setHeatmapData(null);
-        setHint(content[lang].waitTurn);
+        setHint(t('bingoPage.waitTurn'));
       } else {
         calculateHint(newBoard, newHistory.length);
       }
@@ -219,7 +172,7 @@ export default function BingoHelper() {
     } else {
       setBestMove(null);
       setHeatmapData(null);
-      setHint(content[lang].waitTurn);
+      setHint(t('bingoPage.waitTurn'));
     }
   };
 
@@ -264,8 +217,8 @@ export default function BingoHelper() {
 
           <div className={styles.info}>
             <div className={styles.statsRow}>
-              <span>{content[lang].moves}: {moveHistory.length} / {MAX_MOVES}</span>
-              <span>{content[lang].lines}: {completedLines.length} / {TARGET_LINES}</span>
+              <span>{t('bingoPage.moves')}: {moveHistory.length} / {MAX_MOVES}</span>
+              <span>{t('bingoPage.lines')}: {completedLines.length} / {TARGET_LINES}</span>
             </div>
             <div className={styles.hint}>{hint}</div>
           </div>
@@ -299,7 +252,7 @@ export default function BingoHelper() {
               checked={showHeatmap}
               onChange={(e) => setShowHeatmap(e.target.checked)}
             />
-            {content[lang].heatmap}
+            {t('bingoPage.heatmap')}
           </label>
 
           <div className={styles.controls}>
@@ -308,10 +261,10 @@ export default function BingoHelper() {
               className={`${styles.btn} ${styles.undoBtn}`}
               disabled={moveHistory.length === 0}
             >
-              {content[lang].undo}
+              {t('bingoPage.undo')}
             </button>
             <button onClick={reset} className={`${styles.btn} ${styles.resetBtn}`}>
-              {content[lang].reset}
+              {t('bingoPage.reset')}
             </button>
           </div>
         </div>
@@ -323,7 +276,7 @@ export default function BingoHelper() {
               className={styles.historyToggle}
               onClick={() => setIsHistoryOpen(!isHistoryOpen)}
             >
-              <span>{content[lang].history}</span>
+              <span>{t('bingoPage.history')}</span>
               <span>{isHistoryOpen ? '▲' : '▼'}</span>
             </button>
 
@@ -331,14 +284,14 @@ export default function BingoHelper() {
               <div className={styles.historyList}>
                 {gameHistory.length === 0 ? (
                   <div className={styles.historyItem} style={{ justifyContent: 'center', color: 'var(--text-muted)' }}>
-                    {content[lang].emptyHistory}
+                    {t('bingoPage.emptyHistory')}
                   </div>
                 ) : (
                   gameHistory.map(item => (
                     <div key={item.id} className={styles.historyItem}>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.date.split(',')[0]}</span>
                       <span style={{ fontWeight: 600, color: item.lines >= item.targetLines ? 'var(--accent-green)' : 'var(--text-main)' }}>
-                        {item.lines} / {item.targetLines} {lang === 'ru' ? 'лин.' : 'lines'}
+                        {item.lines} / {item.targetLines} {t('common.lines')}
                       </span>
                     </div>
                   ))
@@ -352,7 +305,7 @@ export default function BingoHelper() {
                     className={styles.btn}
                     style={{ marginTop: '12px', fontSize: '0.8rem', padding: '8px' }}
                   >
-                    {content[lang].clearHistory}
+                    {t('bingoPage.clearHistory')}
                   </button>
                 )}
               </div>
@@ -364,11 +317,11 @@ export default function BingoHelper() {
         <div className={styles.sideColumn}>
           <div className={styles.descriptionSection}>
             <div className={styles.descriptionHeader}>
-              <h3>{content[lang].descTitle}</h3>
+              <h3>{t('bingoPage.descTitle')}</h3>
             </div>
-            <p className={styles.mainDesc}>{content[lang].descText}</p>
+            <p className={styles.mainDesc}>{t('bingoPage.descText')}</p>
             <ul className={styles.descList}>
-              {content[lang].howItWorks.map((item, i) => (
+              {Array.isArray(t('bingoPage.howItWorks')) && t('bingoPage.howItWorks').map((item: string, i: number) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
