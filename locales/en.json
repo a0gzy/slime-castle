@@ -20,7 +20,12 @@
         "monopolyTitle": "Monopoly",
         "monopolyDesc": "Monopoly event tracker. Follow your progress, calculate points, and find out how lucky you are this season.",
         "wikiTitle": "Slime Castle Wiki",
-        "wikiDesc": "Knowledge base, strategies, and tips from the Slime Castle community."
+        "wikiDesc": "Knowledge base, strategies, and tips from the Slime Castle community.",
+        "explore": "Explore",
+        "manage": "Manage",
+        "track": "Track",
+        "learn": "Learn",
+        "author": "Created by a0g"
     },
     "wiki": {
         "title": "Slime Castle Wiki",
@@ -63,12 +68,12 @@
         "reroll_secrets": "Reroll Secrets",
         "quick_actions": "Quick Actions (Table)",
         "action_left": "Left Click — mark as acquired",
-        "action_right": "Right Click — add to Duplicates",
+        "action_right": "Right Click (or Long Press) — add to Duplicates",
         "dupes_list": "Duplicates List",
         "dupes_left": "Left Click — strike-through (collected)",
-        "dupes_right": "Right Click — delete from list",
+        "dupes_right": "Right Click (or Long Press) — delete from list",
         "desc": "The duplicates list below helps you understand which runes can be safely rerolled.",
-        "click_hint": "Right-click the table...",
+        "click_hint": "Right Click (or Long Press)...",
         "reset": "Reset"
     },
     "runes": {
@@ -103,7 +108,13 @@
         "download_backup": "Download backup (.json)",
         "save_drive": "Save to Google Drive",
         "save_drive_success": "Saved successfully",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "load_drive": "Load from Google Drive",
+        "load_drive_success": "Loaded!",
+        "loading": "Loading...",
+        "merge_notice": "Local data will be preserved",
+        "load_file": "Load from JSON file",
+        "load_file_success": "File loaded!"
     },
     "admin": {
         "title": "Admin Panel",

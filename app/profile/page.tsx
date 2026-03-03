@@ -3,15 +3,29 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useLanguage } from '@/components/providers/LanguageProvider';
-import { LogOut, Save, Download, Cloud, ShieldCheck } from 'lucide-react';
+import { LogOut, Save, Download, Cloud, ShieldCheck, UploadCloud } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import {
+    DRIVE_FILENAME,
+    getDriveFileId,
+    createDriveFile,
+    updateDriveFile,
+    downloadDriveFile
+} from '@/lib/drive';
 
 export default function ProfilePage() {
     const { user, userData, logout, updateNickname, isAdmin } = useAuth();
     const { t } = useLanguage();
     const [nickname, setNickname] = useState(userData?.nickname || '');
+
     const [savingDrive, setSavingDrive] = useState(false);
     const [driveSuccess, setDriveSuccess] = useState(false);
+
+    const [loadingDrive, setLoadingDrive] = useState(false);
+    const [loadSuccess, setLoadSuccess] = useState(false);
+
     const router = useRouter();
 
     if (!user || !userData) {
@@ -31,32 +45,142 @@ export default function ProfilePage() {
         router.push('/');
     };
 
+    const getExportData = () => {
+        const bingoHistory = JSON.parse(localStorage.getItem('bingo_history') || '[]');
+        const monopolyEventHistory = JSON.parse(localStorage.getItem('monopoly_event_history') || '[]');
+        const runesGrid = JSON.parse(localStorage.getItem('slime_runes_grid') || '{}');
+        const runesDupes = JSON.parse(localStorage.getItem('slime_runes_dupelist_v2') || '{}');
+
+        return {
+            bingo_history: bingoHistory,
+            monopoly_event_history: monopolyEventHistory,
+            slime_runes_grid: runesGrid,
+            slime_runes_dupelist_v2: runesDupes,
+            lastSync: new Date().toISOString()
+        };
+    };
+
+    const importData = (data: any) => {
+        if (!data) return;
+
+        // Overwrite with imported data
+        if (data.bingo_history) {
+            localStorage.setItem('bingo_history', JSON.stringify(data.bingo_history));
+        }
+        if (data.monopoly_event_history) {
+            localStorage.setItem('monopoly_event_history', JSON.stringify(data.monopoly_event_history));
+        }
+        if (data.slime_runes_grid) {
+            localStorage.setItem('slime_runes_grid', JSON.stringify(data.slime_runes_grid));
+        }
+        if (data.slime_runes_dupelist_v2) {
+            localStorage.setItem('slime_runes_dupelist_v2', JSON.stringify(data.slime_runes_dupelist_v2));
+        }
+    };
+
     const handleDownloadBackup = () => {
-        const dummyData = { status: "empty_backup", version: "1.0" };
-        const blob = new Blob([JSON.stringify(dummyData, null, 2)], { type: 'application/json' });
+        const data = getExportData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'backup.json';
+        a.download = `slime_castle_backup_${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     };
 
+    const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target?.result as string;
+                const data = JSON.parse(content);
+                importData(data);
+                setLoadSuccess(true);
+                setTimeout(() => setLoadSuccess(false), 3000);
+            } catch (error) {
+                console.error('Failed to parse JSON file:', error);
+                alert('Invalid JSON file. Please try a valid backup file.');
+            }
+            // Reset input so the same file can be selected again
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    };
+
+    const getDriveAccessToken = async () => {
+        const provider = new GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/drive.file');
+
+        const result = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (!credential?.accessToken) {
+            throw new Error('Failed to get Drive access token');
+        }
+        return credential.accessToken;
+    };
+
     const handleSaveDrive = async () => {
-        setSavingDrive(true);
-        setDriveSuccess(false);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setSavingDrive(false);
-        setDriveSuccess(true);
-        setTimeout(() => setDriveSuccess(false), 3000);
+        try {
+            setSavingDrive(true);
+            setDriveSuccess(false);
+
+            const token = await getDriveAccessToken();
+            const data = getExportData();
+            const content = JSON.stringify(data, null, 2);
+
+            let fileId = await getDriveFileId(token, DRIVE_FILENAME);
+            if (fileId) {
+                await updateDriveFile(token, fileId, content);
+            } else {
+                await createDriveFile(token, DRIVE_FILENAME, content);
+            }
+
+            setDriveSuccess(true);
+            setTimeout(() => setDriveSuccess(false), 3000);
+        } catch (error) {
+            console.error('Save to Drive failed:', error);
+            alert('Failed to save to Google Drive. Please try again.');
+        } finally {
+            setSavingDrive(false);
+        }
+    };
+
+    const handleLoadDrive = async () => {
+        try {
+            setLoadingDrive(true);
+            setLoadSuccess(false);
+
+            const token = await getDriveAccessToken();
+            const fileId = await getDriveFileId(token, DRIVE_FILENAME);
+
+            if (!fileId) {
+                alert('No sync file found in your Google Drive!');
+                return;
+            }
+
+            const data = await downloadDriveFile(token, fileId);
+            importData(data);
+
+            setLoadSuccess(true);
+            setTimeout(() => setLoadSuccess(false), 3000);
+
+        } catch (error) {
+            console.error('Load from Drive failed:', error);
+            alert('Failed to load from Google Drive. Please try again.');
+        } finally {
+            setLoadingDrive(false);
+        }
     };
 
     return (
         <div className="flex-1 flex flex-col items-center p-6 md:p-12 bg-zinc-950">
-            <div className="max-w-2xl w-full space-y-8">
+            <div className="max-w-4xl w-full space-y-8">
 
                 <h1 className="text-4xl font-extrabold text-white tracking-tight">
                     {t('profile.title')}
@@ -128,34 +252,79 @@ export default function ProfilePage() {
 
                 {/* Data Management Card */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
-                        {t('profile.data_management')}
-                    </h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+                            {t('profile.data_management')}
+                        </h3>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="file"
+                                id="file-import"
+                                accept=".json"
+                                className="hidden"
+                                onChange={handleFileImport}
+                            />
+                            <button
+                                onClick={() => document.getElementById('file-import')?.click()}
+                                className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+                            >
+                                <UploadCloud className="w-4 h-4" />
+                                {loadSuccess ? t('profile.load_file_success') : t('profile.load_file')}
+                            </button>
+                            <button
+                                onClick={handleDownloadBackup}
+                                className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-lg transition-colors"
+                            >
+                                <Download className="w-4 h-4" />
+                                {t('profile.download_backup')}
+                            </button>
+                        </div>
+                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button
-                            onClick={handleDownloadBackup}
-                            className="flex flex-col items-center justify-center gap-3 p-6 bg-zinc-950 border border-zinc-800 hover:border-emerald-500/50 hover:bg-emerald-500/5 rounded-xl transition-all group"
-                        >
-                            <Download className="w-8 h-8 text-emerald-500 group-hover:scale-110 transition-transform" />
-                            <span className="font-semibold text-zinc-300">{t('profile.download_backup')}</span>
-                        </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Save to Drive Card */}
+                        <div className="flex items-center p-6 bg-zinc-950/50 border border-blue-500/20 rounded-xl gap-4">
+                            <div className="p-3 bg-blue-500/10 rounded-full text-blue-400 shrink-0">
+                                <UploadCloud className="w-8 h-8" />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="font-bold text-zinc-200 mb-1">{t('profile.save_drive')}</h4>
+                                <p className="text-xs text-zinc-500 leading-tight mb-3">
+                                    Экспорт всех трекеров в Google Диск
+                                </p>
+                                <button
+                                    onClick={handleSaveDrive}
+                                    disabled={savingDrive || loadingDrive}
+                                    className="w-full py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                                >
+                                    {savingDrive ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : <Cloud className="w-4 h-4" />}
+                                    {driveSuccess ? t('profile.save_drive_success') : t('common.save')}
+                                </button>
+                            </div>
+                        </div>
 
-                        <button
-                            onClick={handleSaveDrive}
-                            disabled={savingDrive}
-                            className="flex flex-col items-center justify-center gap-3 p-6 bg-zinc-950 border border-zinc-800 hover:border-blue-500/50 hover:bg-blue-500/5 rounded-xl transition-all group disabled:opacity-70 disabled:pointer-events-none relative overflow-hidden"
-                        >
-                            {savingDrive ? (
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-3" />
-                            ) : (
-                                <Cloud className={`w-8 h-8 ${driveSuccess ? 'text-green-400' : 'text-blue-500'} group-hover:scale-110 transition-transform`} />
-                            )}
-                            <span className={`font-semibold ${driveSuccess ? 'text-green-400' : 'text-zinc-300'}`}>
-                                {savingDrive ? t('profile.saving') : (driveSuccess ? t('profile.save_drive_success') : t('profile.save_drive'))}
-                            </span>
-                        </button>
+                        {/* Load from Drive Card */}
+                        <div className="flex items-center p-6 bg-zinc-950/50 border border-emerald-500/20 rounded-xl gap-4">
+                            <div className="p-3 bg-emerald-500/10 rounded-full text-emerald-400 shrink-0">
+                                <Download className="w-8 h-8" />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="font-bold text-zinc-200 mb-1">{t('profile.load_drive')}</h4>
+                                <p className="text-xs text-zinc-500 leading-tight mb-3">
+                                    {t('profile.merge_notice')}
+                                </p>
+                                <button
+                                    onClick={handleLoadDrive}
+                                    disabled={loadingDrive || savingDrive}
+                                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                                >
+                                    {loadingDrive ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : <Download className="w-4 h-4" />}
+                                    {loadSuccess ? t('profile.load_drive_success') : t('profile.load_drive').split(' ')[0]}
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -163,3 +332,4 @@ export default function ProfilePage() {
         </div>
     );
 }
+

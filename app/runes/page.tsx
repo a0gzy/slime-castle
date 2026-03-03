@@ -117,36 +117,36 @@ export default function RunesPage() {
                 {/* Main Mythic Rune Tracker Table (LEFT) */}
                 <div className="flex flex-col shrink-0 w-full lg:w-auto">
                     <div className="overflow-x-auto pb-4 scrollbar-hide">
-                        <div className="min-w-[480px]">
-                            <div className="flex items-center mb-6 gap-4 px-2">
-                                <h1 className="text-2xl md:text-3xl font-extrabold text-emerald-600 w-40 md:w-56 text-right tracking-tight leading-tight shrink-0">
+                        <div className="w-full">
+                            <div className="flex items-center mb-6 gap-2 md:gap-4 px-1 md:px-2">
+                                <h1 className="text-xl md:text-3xl font-extrabold text-emerald-600 w-32 md:w-56 text-right tracking-tight leading-tight shrink-0">
                                     {t('runesPage.title')}
                                 </h1>
-                                <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
+                                <div className="flex gap-1.5 md:gap-3 shrink-0">
                                     {['sword', 'armor', 'helmet', 'amulet'].map((name, i) => (
-                                        <div key={i} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-zinc-900/50 rounded-lg border border-zinc-800/50">
+                                        <div key={i} className="w-7 h-7 md:w-10 md:h-10 flex items-center justify-center bg-zinc-900/50 rounded-lg border border-zinc-800/50">
                                             <img
                                                 src={`/icons/${name}.png`}
                                                 alt={name}
-                                                className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                                                className="w-5 h-5 md:w-8 md:h-8 object-contain"
                                                 style={{ filter: 'sepia(1) saturate(5) hue-rotate(-20deg) brightness(0.9) contrast(1.2)' }}
                                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                             />
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-zinc-500 font-bold ml-4 text-lg md:text-xl shrink-0">%</div>
+                                <div className="text-zinc-500 font-bold w-10 md:w-14 text-right text-base md:text-xl shrink-0">%</div>
                             </div>
 
-                            <div className="flex flex-col gap-1.5 text-[14px] font-medium tracking-tight">
+                            <div className="flex flex-col gap-1 md:gap-1.5 text-[14px] font-medium tracking-tight">
                                 {RUNES.map(rune => {
                                     const rowProg = grid[rune.id] ? grid[rune.id].filter(Boolean).length / 4 * 100 : 0;
                                     return (
-                                        <div key={rune.id} className="flex items-center gap-4 hover:bg-zinc-900/40 rounded-lg py-1 px-2 transition-colors">
-                                            <div className="w-40 md:w-56 text-right pr-3 text-zinc-400 font-bold text-sm md:text-base shrink-0">
+                                        <div key={rune.id} className="flex items-center gap-2 md:gap-4 hover:bg-zinc-900/40 rounded-lg py-1 px-1 md:px-2 transition-colors">
+                                            <div className="w-32 md:w-56 text-right pr-2 md:pr-3 text-zinc-400 font-bold text-[13px] md:text-base shrink-0 truncate">
                                                 {t(`runes.${rune.id}`)}
                                             </div>
-                                            <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
+                                            <div className="flex gap-1.5 md:gap-3 shrink-0">
                                                 {[0, 1, 2, 3].map(colIdx => {
                                                     const isActive = grid[rune.id] && grid[rune.id][colIdx];
                                                     return (
@@ -154,44 +154,44 @@ export default function RunesPage() {
                                                             key={colIdx}
                                                             onClick={() => toggleCell(rune.id, colIdx)}
                                                             onContextMenu={(e) => handleRightClick(e, rune.id, colIdx)}
-                                                            className={`w-8 h-8 md:w-10 md:h-10 rounded-md flex items-center justify-center transition-all border-2 ${isActive
+                                                            className={`w-7 h-7 md:w-10 md:h-10 rounded-md flex items-center justify-center transition-all border-2 ${isActive
                                                                 ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
                                                                 : 'bg-zinc-900/80 border-[#27272a] text-transparent hover:border-zinc-500'
                                                                 }`}
                                                         >
-                                                            <svg className="w-5 h-5 md:w-6 md:h-6 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                                                            <svg className="w-4 h-4 md:w-6 md:h-6 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
                                                         </button>
                                                     );
                                                 })}
                                             </div>
-                                            <div className={`w-14 text-right font-mono ml-4 text-base md:text-lg font-bold shrink-0 ${rowProg === 100 ? 'text-[#ff9d00]' : 'text-[#ff9d00]/70'}`}>
+                                            <div className={`w-10 md:w-14 text-right font-mono text-[13px] md:text-lg font-bold shrink-0 ml-0 ${rowProg === 100 ? 'text-[#ff9d00]' : 'text-[#ff9d00]/70'}`}>
                                                 {Math.round(rowProg)}%
                                             </div>
                                         </div>
                                     );
                                 })}
 
-                                <div className="flex items-center gap-4 px-2 py-6 mt-4 border-t border-zinc-800/50">
-                                    <div className="w-40 md:w-56 text-right pr-3 text-emerald-600 font-extrabold text-base md:text-lg shrink-0">
+                                <div className="flex items-center gap-2 md:gap-4 px-1 md:px-2 py-6 mt-4 border-t border-zinc-800/50">
+                                    <div className="w-32 md:w-56 text-right pr-2 md:pr-3 text-emerald-600 font-extrabold text-[13px] md:text-lg shrink-0">
                                         {t('runesPage.allRunes')}
                                     </div>
-                                    <div className="flex gap-2.5 md:gap-3 ml-2 shrink-0">
+                                    <div className="flex gap-1.5 md:gap-3 shrink-0">
                                         {[0, 1, 2, 3].map(colIdx => {
                                             let count = 0;
                                             RUNES.forEach(r => count += (grid[r.id]?.[colIdx] ? 1 : 0));
                                             const prog = Math.round((count / RUNES.length) * 100);
                                             return (
-                                                <div key={colIdx} className="w-8 md:w-10 text-center font-mono text-emerald-600 font-bold text-sm md:text-base">
+                                                <div key={colIdx} className="w-7 md:w-10 text-center font-mono text-emerald-600 font-bold text-[11px] md:text-base">
                                                     {prog}%
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                    <div className="w-14 text-right font-mono font-extrabold text-emerald-600 ml-4 text-base md:text-lg shrink-0">
+                                    <div className="w-10 md:w-14 text-right font-mono font-extrabold text-[#ff9d00] text-base md:text-lg shrink-0">
                                         {(() => {
                                             let tCount = 0;
                                             RUNES.forEach(r => tCount += (grid[r.id]?.filter(Boolean).length || 0));
-                                            return ((tCount / (RUNES.length * 4)) * 100).toFixed(1);
+                                            return Math.round((tCount / (RUNES.length * 4)) * 100);
                                         })()}%
                                     </div>
                                 </div>
