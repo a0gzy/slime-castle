@@ -8,11 +8,10 @@
         "logout": "Logout"
     },
     "landing": {
-        "title1": "Your ultimate companion for ",
-        "title2": "",
-        "subtitle": "Track runes, calculate optimal bingo moves, and explore the knowledge base—all in one place.",
-        "primaryBtn": "Open Bingo",
-        "secondaryBtn": "Open Wiki",
+        "title1": "Information portal for ",
+        "title2": "Slime Castle",
+        "subtitle": "Track runes and events, calculate optimal bingo moves, and explore the knowledge base—all in one place.",
+        "primaryBtn": "Learn More",
         "trusted": "Trusted by top players and guilds",
         "bingoTitle": "Bingo Helper",
         "bingoDesc": "Smart algorithm and heatmaps to maximize your completed bingo lines.",
