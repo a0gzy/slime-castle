@@ -172,6 +172,8 @@
         "delete_event_confirm": "Are you sure you want to delete this event from history?",
         "instruction_1": "Select a multiplier and click the dice result — the tracker will move the slime and calculate points automatically.",
         "instruction_2": "If the slime is out of place, simply drag and drop it to the correct cell.",
+        "instruction_3": "Create new periods for each event to keep your roll history and stats organized.",
+        "instruction_4": "Any event from the history can be made active again for editing by clicking the 'Make Active' button.",
         "daily_dice_tip": "You can get **25** dice every day (from tasks and the daily free pack)."
     }
 }

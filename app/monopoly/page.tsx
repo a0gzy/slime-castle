@@ -665,6 +665,14 @@ export default function MonopolyPage() {
                                         <p>{t('monopolyPage.instruction_1')}</p>
                                     </div>
                                     <div className="flex gap-3 text-zinc-500">
+                                        <span className="font-bold">⏱️</span>
+                                        <p>{t('monopolyPage.instruction_3')}</p>
+                                    </div>
+                                    <div className="flex gap-3 text-zinc-500">
+                                        <span className="font-bold">🔄</span>
+                                        <p>{t('monopolyPage.instruction_4')}</p>
+                                    </div>
+                                    <div className="flex gap-3 text-zinc-500">
                                         <span className="font-bold">💡</span>
                                         <p>{t('monopolyPage.instruction_2')}</p>
                                     </div>
