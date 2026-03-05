@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Grid3X3, Beaker, FileText, UserCircle, LogOut, Coins, Menu, X } from 'lucide-react';
+import { Grid3X3, Beaker, FileText, UserCircle, LogOut, Coins, Menu, X, ChevronDown } from 'lucide-react';
 import { useLanguage } from './providers/LanguageProvider';
 import { useAuth } from './providers/AuthProvider';
 
 export function Navbar() {
-    const { lang, setLang, t } = useLanguage();
+    const { lang, setLang, t, availableLanguages } = useLanguage();
     const { user, login, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
     const navLinks = [
         { href: '/wiki', label: t('nav.wiki'), icon: <FileText className="h-4 w-4" /> },
@@ -42,20 +43,31 @@ export function Navbar() {
                         </div>
 
                         <div className="flex items-center gap-2 md:gap-4">
-                            {/* Language Switcher */}
-                            <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 md:p-1">
+                            {/* Language Selector Dropdown */}
+                            <div className="relative">
                                 <button
-                                    className={`px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold rounded transition-colors ${lang === 'ru' ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}`}
-                                    onClick={() => setLang('ru')}
+                                    onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                                    className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-zinc-300 hover:text-white transition-colors"
                                 >
-                                    RU
+                                    {lang.toUpperCase()}
+                                    <ChevronDown className={`w-3 h-3 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
-                                <button
-                                    className={`px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold rounded transition-colors ${lang === 'en' ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}`}
-                                    onClick={() => setLang('en')}
-                                >
-                                    EN
-                                </button>
+                                {langDropdownOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setLangDropdownOpen(false)} />
+                                        <div className="absolute right-0 top-full mt-1 z-50 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl py-1 min-w-[80px]">
+                                            {availableLanguages.map(l => (
+                                                <button
+                                                    key={l}
+                                                    onClick={() => { setLang(l); setLangDropdownOpen(false); }}
+                                                    className={`w-full text-left px-3 py-2 text-xs font-bold transition-colors ${lang === l ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}
+                                                >
+                                                    {l.toUpperCase()}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             {/* Desktop Auth */}
@@ -103,7 +115,7 @@ export function Navbar() {
             >
                 <div className="flex flex-col h-full">
                     <div className="flex justify-between items-center mb-10">
-                        <span className="font-bold text-zinc-100">Меню</span>
+                        <span className="font-bold text-zinc-100">Menu</span>
                         <button onClick={() => setIsMenuOpen(false)} className="text-zinc-500"><X className="h-6 w-6" /></button>
                     </div>
 
@@ -136,7 +148,7 @@ export function Navbar() {
                                     )}
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold truncate max-w-[140px] tracking-tight">{user.displayName || user.email}</span>
-                                        <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">Профиль</span>
+                                        <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">Profile</span>
                                     </div>
                                 </Link>
                                 <button

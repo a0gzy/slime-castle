@@ -1,16 +1,22 @@
-'use client';
+import { getAllWikiCategories } from "@/lib/wikiCategories";
+import { getAllWikiEntities, WikiEntity } from "@/lib/wiki";
+import { WikiCategoriesClient } from "./WikiCategoriesClient";
 
-import { useLanguage } from '../../components/providers/LanguageProvider';
+export const revalidate = 60;
 
-export default function WikiPage() {
-    const { t } = useLanguage();
+export default async function WikiPage() {
+    const categories = await getAllWikiCategories();
 
-    return (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 bg-zinc-950 text-center">
-            <h1 className="text-3xl font-bold text-white mb-4">{t('wiki.title')}</h1>
-            <p className="text-zinc-400 max-w-md">
-                {t('wiki.soon')}
-            </p>
-        </div>
-    );
+    // Fetch latest changelog entry
+    let latestChangelog: WikiEntity | null = null;
+    try {
+        const changelogEntities = await getAllWikiEntities('changelogs');
+        if (changelogEntities.length > 0) {
+            latestChangelog = changelogEntities[0]; // Already sorted by updatedAt desc
+        }
+    } catch (e) {
+        console.error('Failed to fetch changelogs:', e);
+    }
+
+    return <WikiCategoriesClient categories={categories} latestChangelog={latestChangelog} />;
 }

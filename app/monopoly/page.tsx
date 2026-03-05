@@ -215,8 +215,8 @@ export default function MonopolyPage() {
                 finalValue: finalValue
             });
 
-            // Process score if normal cell
-            if (finalValue) {
+            // Process score if normal cell (ignore gems)
+            if (finalValue && landedCell.itemType !== 'gems') {
                 handleLevelReward(finalValue);
             }
         }
@@ -409,7 +409,7 @@ export default function MonopolyPage() {
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full relative">
 
                     {/* LEFT PANEL: Game Board & Roll Controls */}
-                    <div className="xl:col-span-8 flex flex-col gap-6 w-full">
+                    <div onContextMenu={(e) => e.preventDefault()} className="xl:col-span-8 flex flex-col gap-6 w-full">
 
                         {/* Game Board Container */}
                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 md:p-8 shadow-xl relative w-full flex flex-col items-center justify-center">
@@ -860,9 +860,9 @@ export default function MonopolyPage() {
                                             <span>1x {t('monopolyPage.item_gold_key')}</span>
                                             <span className="text-zinc-500 text-[10px]">x{multiplier}</span>
                                         </button>
-                                        <button onClick={() => handleModalSubmit('gems', 100, true)} className="w-full py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg font-bold text-purple-400 transition-colors flex items-center justify-between px-4 text-sm">
+                                        <button onClick={() => handleModalSubmit('gems', 100, false)} className="w-full py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg font-bold text-purple-400 transition-colors flex items-center justify-between px-4 text-sm">
                                             <span>100 {t('monopolyPage.item_gems')}</span>
-                                            <span className="text-zinc-500 text-[10px]">+{100 * multiplier}</span>
+                                            <span className="text-zinc-500 text-[10px]">x{multiplier}</span>
                                         </button>
                                         <button onClick={() => handleModalSubmit('boss_ticket', 1, false)} className="w-full py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg font-bold text-red-400 transition-colors flex items-center justify-between px-4 text-sm">
                                             <span>1x {t('monopolyPage.item_boss_ticket')}</span>

@@ -29,7 +29,12 @@
     },
     "wiki": {
         "title": "Slime Castle Wiki",
-        "soon": "This section is currently under construction. Soon a complete knowledge base will be available here."
+        "soon": "This section is currently under construction. Soon a complete knowledge base will be available here.",
+        "categories": {
+            "slimes": "Slimes",
+            "gear": "Gear",
+            "guides": "Guides"
+        }
     },
     "common": {
         "save": "Save",

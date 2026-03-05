@@ -16,7 +16,7 @@ import {
 } from '@/lib/drive';
 
 export default function ProfilePage() {
-    const { user, userData, logout, updateNickname, isAdmin } = useAuth();
+    const { user, userData, logout, updateNickname, isAdmin, isEditor } = useAuth();
     const { t } = useLanguage();
     const [nickname, setNickname] = useState(userData?.nickname || '');
 
@@ -230,15 +230,23 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="pt-2 flex flex-wrap gap-3">
-                            {isAdmin && (
+                            {isAdmin ? (
                                 <button
                                     onClick={() => router.push('/admin')}
                                     className="px-5 py-2.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 font-bold rounded-lg transition-all flex items-center gap-2"
                                 >
                                     <ShieldCheck className="w-4 h-4" />
-                                    {t('common.admin_panel')}
+                                    Admin Panel
                                 </button>
-                            )}
+                            ) : isEditor ? (
+                                <button
+                                    onClick={() => router.push('/admin/lang-editor')}
+                                    className="px-5 py-2.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 font-bold rounded-lg transition-all flex items-center gap-2"
+                                >
+                                    <ShieldCheck className="w-4 h-4" />
+                                    Language Editor
+                                </button>
+                            ) : null}
                             <button
                                 onClick={handleLogout}
                                 className="px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold rounded-lg transition-all flex items-center gap-2"

@@ -138,7 +138,7 @@ export default function RunesPage() {
                                 <div className="text-zinc-500 font-bold w-10 md:w-14 text-right text-base md:text-xl shrink-0">%</div>
                             </div>
 
-                            <div className="flex flex-col gap-1 md:gap-1.5 text-[14px] font-medium tracking-tight">
+                            <div onContextMenu={(e) => e.preventDefault()} className="flex flex-col gap-1 md:gap-1.5 text-[14px] font-medium tracking-tight">
                                 {RUNES.map(rune => {
                                     const rowProg = grid[rune.id] ? grid[rune.id].filter(Boolean).length / 4 * 100 : 0;
                                     return (
@@ -242,7 +242,7 @@ export default function RunesPage() {
                             {t('runesPage.duplicates')}
                         </div>
 
-                        <div className="flex flex-col gap-5">
+                        <div onContextMenu={(e) => e.preventDefault()} className="flex flex-col gap-5">
                             {[0, 1, 2, 3].map(gearIdx => {
                                 const list = dupesList[gearIdx] || [];
                                 const iconNames = ['sword', 'armor', 'helmet', 'amulet'];
